@@ -207,9 +207,7 @@ async function captureCanvas(el) {
     windowWidth: 1920,
     windowHeight: 1080,
     onclone: (_doc, clonedEl) => {
-      // The real #slide-frame has a translate+scale transform applied for
-      // fit-to-viewport. Strip it in the clone so html2canvas sees the element
-      // at its native 1920×1080 size with no transform interference.
+      // Strip the fit-to-viewport transform so html2canvas sees native 1920×1080.
       const frame = clonedEl.closest
         ? clonedEl.closest("#slide-frame") || _doc.getElementById("slide-frame")
         : _doc.getElementById("slide-frame");
@@ -217,6 +215,8 @@ async function captureCanvas(el) {
         frame.style.transform = "none";
         frame.style.position = "relative";
       }
+      // Hide UI-only elements (toggle, ribbon, footer hint) from the export.
+      _doc.querySelectorAll(".export-hide").forEach(el => { el.style.display = "none"; });
     },
   });
 }

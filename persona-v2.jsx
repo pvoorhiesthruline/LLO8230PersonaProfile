@@ -78,7 +78,6 @@ function PersonaProfileV2({ mode = "example" }) {
   const startBlank = mode === "blank";
   const { state, set, setList, loadExample, clearAll } = PC2.usePersonaState(`v2-${mode}`, { startBlank });
   const ref = useRef2(null);
-  const F = (props) => <WS2.Editable {...props} />;
 
   return (
     <div ref={ref} className="ws" style={v2.root}>
@@ -89,18 +88,18 @@ function PersonaProfileV2({ mode = "example" }) {
         <PC2.Avatar name={state.name} size={172} variant="dark" />
         <div>
           <div style={v2.pKicker}>The Persona</div>
-          <F value={state.name} onChange={(v) => set("name", v)} placeholder="Name the persona"
+          <WS2.Editable value={state.name} onChange={(v) => set("name", v)} placeholder="Name the persona"
              className="id-field" style={{ ...v2.pName, marginTop: 10 }} />
-          <F value={state.role} onChange={(v) => set("role", v)} placeholder="Role or title" className="id-field" style={v2.pRole} />
+          <WS2.Editable value={state.role} onChange={(v) => set("role", v)} placeholder="Role or title" className="id-field" style={v2.pRole} />
         </div>
         <div style={v2.pQuoteWrap}>
           <span style={v2.pQuoteMark}>&ldquo;</span>
-          <F value={state.quote} onChange={(v) => set("quote", v)} multiline tag="div"
+          <WS2.Editable value={state.quote} onChange={(v) => set("quote", v)} multiline tag="div"
              className="id-field" placeholder="A short quote, in the user’s own words" style={v2.pQuote} />
         </div>
         <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: 14 }}>
           {!state.touched && <PC2.SampleRibbon dark />}
-          <div style={v2.pFootHint}>
+          <div className="export-hide" style={v2.pFootHint}>
             <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round">
               <rect x="2" y="3" width="12" height="10" rx="2"/><circle cx="6" cy="7" r="1.4"/><path d="M3 12l3.5-3 2.5 2 2-1.5 2 2.5"/>
             </svg>
