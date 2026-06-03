@@ -194,10 +194,30 @@ function loadScript(src) {
 
 async function captureCanvas(el) {
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+  // Wait for all webfonts to finish loading before capture
+  await document.fonts.ready;
   return window.html2canvas(el, {
-    scale: 1, useCORS: true, allowTaint: true,
-    width: 1920, height: 1080, scrollX: 0, scrollY: 0,
-    windowWidth: 1920, windowHeight: 1080,
+    scale: 2,
+    useCORS: true,
+    allowTaint: true,
+    width: 1920,
+    height: 1080,
+    scrollX: 0,
+    scrollY: 0,
+    windowWidth: 1920,
+    windowHeight: 1080,
+    onclone: (_doc, clonedEl) => {
+      // The real #slide-frame has a translate+scale transform applied for
+      // fit-to-viewport. Strip it in the clone so html2canvas sees the element
+      // at its native 1920×1080 size with no transform interference.
+      const frame = clonedEl.closest
+        ? clonedEl.closest("#slide-frame") || _doc.getElementById("slide-frame")
+        : _doc.getElementById("slide-frame");
+      if (frame) {
+        frame.style.transform = "none";
+        frame.style.position = "relative";
+      }
+    },
   });
 }
 
@@ -205,11 +225,12 @@ async function exportPDF(target) {
   const canvas = await captureCanvas(target);
   await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
   const { jsPDF } = window.jspdf;
-  // Landscape page sized exactly to the 16:9 artboard (in mm: 1920:1080 ≈ 508×285.75mm)
+  // Landscape page sized exactly to the 16:9 artboard (508×285.75mm)
   const W_MM = 508, H_MM = 285.75;
   const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: [W_MM, H_MM] });
-  const imgData = canvas.toDataURL("image/jpeg", 0.96);
-  pdf.addImage(imgData, "JPEG", 0, 0, W_MM, H_MM);
+  // PNG preserves sharp text better than JPEG for type-heavy layouts
+  const imgData = canvas.toDataURL("image/png");
+  pdf.addImage(imgData, "PNG", 0, 0, W_MM, H_MM);
   pdf.save("persona-profile.pdf");
 }
 
