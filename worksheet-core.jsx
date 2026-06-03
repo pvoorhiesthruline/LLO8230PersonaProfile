@@ -245,12 +245,11 @@ async function exportPPT(target) {
   await pptx.writeFile({ fileName: "persona-profile.pptx" });
 }
 
-async function exportSVG(target) {
-  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js");
-  const svgDataUrl = await window.domtoimage.toSvg(target, { width: 1920, height: 1080 });
+async function exportPNG(target) {
+  const canvas = await captureCanvas(target);
   const a = document.createElement("a");
-  a.href = svgDataUrl;
-  a.download = "persona-profile.svg";
+  a.href = canvas.toDataURL("image/png");
+  a.download = "persona-profile.png";
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -357,13 +356,13 @@ function ExportButton({ getTarget, pageClass = "print-slide" }) {
             style={itemStyle}
             onMouseEnter={e => e.currentTarget.style.background = "rgba(245,243,239,0.07)"}
             onMouseLeave={e => e.currentTarget.style.background = "none"}
-            onClick={() => run("SVG", () => exportSVG(target()))}
+            onClick={() => run("PNG", () => exportPNG(target()))}
           >
             <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="4" cy="8" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="12" cy="12" r="2"/>
-              <path d="M6 7.2 10 4.8M6 8.8l4 2.4"/>
+              <rect x="2" y="2" width="12" height="12" rx="2"/>
+              <circle cx="5.5" cy="5.5" r="1.2"/><path d="M2 11l3.5-3.5 2.5 2 2-2 3 3"/>
             </svg>
-            SVG
+            PNG
           </button>
         </div>
       )}
