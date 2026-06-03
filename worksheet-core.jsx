@@ -180,35 +180,173 @@ function CategoryGroup({ selected, onToggle, variant = "default" }) {
   );
 }
 
-// ── Export-to-PDF button ───────────────────────────────────────────────
-// Click → host the artboard's DOM node as .print-target, set body class for
-// page size, window.print(), then revert. Each variation passes its target
-// element and its page size.
+// ── Script loader (lazy CDN deps for export) ──────────────────────────
+function loadScript(src) {
+  return new Promise((resolve, reject) => {
+    if (document.querySelector(`script[src="${src}"]`)) { resolve(); return; }
+    const s = document.createElement("script");
+    s.src = src; s.onload = resolve; s.onerror = reject;
+    document.head.appendChild(s);
+  });
+}
 
-function ExportButton({ getTarget, pageClass = "print-slide", label = "Export PDF" }) {
-  const onClick = () => {
-    const target = getTarget();
-    if (!target) return;
-    target.classList.add("print-target");
-    document.body.classList.add(pageClass);
-    // Defer print to next frame so the class hits the stylesheet
-    requestAnimationFrame(() => {
-      window.print();
-      // Clean up after the print dialog closes
-      setTimeout(() => {
-        target.classList.remove("print-target");
-        document.body.classList.remove(pageClass);
-      }, 200);
-    });
+// ── Export helpers ─────────────────────────────────────────────────────
+
+async function captureCanvas(el) {
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js");
+  return window.html2canvas(el, {
+    scale: 1, useCORS: true, allowTaint: true,
+    width: 1920, height: 1080, scrollX: 0, scrollY: 0,
+    windowWidth: 1920, windowHeight: 1080,
+  });
+}
+
+async function exportPDF(target, pageClass) {
+  target.classList.add("print-target");
+  document.body.classList.add(pageClass);
+  requestAnimationFrame(() => {
+    window.print();
+    setTimeout(() => {
+      target.classList.remove("print-target");
+      document.body.classList.remove(pageClass);
+    }, 200);
+  });
+}
+
+async function exportPPT(target) {
+  const canvas = await captureCanvas(target);
+  const dataUrl = canvas.toDataURL("image/png");
+  await loadScript("https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js");
+  const pptx = new window.PptxGenJS();
+  pptx.layout = "LAYOUT_16x9";
+  const slide = pptx.addSlide();
+  slide.addImage({ data: dataUrl, x: 0, y: 0, w: "100%", h: "100%" });
+  await pptx.writeFile({ fileName: "persona-profile.pptx" });
+}
+
+async function exportSVG(target) {
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js");
+  const svgDataUrl = await window.domtoimage.toSvg(target, { width: 1920, height: 1080 });
+  const a = document.createElement("a");
+  a.href = svgDataUrl;
+  a.download = "persona-profile.svg";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+// ── Export menu button ─────────────────────────────────────────────────
+// Replaces the single PDF button with a compact three-option dropdown.
+
+function ExportButton({ getTarget, pageClass = "print-slide" }) {
+  const [open, setOpen] = useState(false);
+  const [busy, setBusy] = useState(null);
+  const menuRef = useRef(null);
+
+  // Close on outside click
+  useEffect(() => {
+    if (!open) return;
+    const handler = (e) => { if (menuRef.current && !menuRef.current.contains(e.target)) setOpen(false); };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
+  const run = async (key, fn) => {
+    setOpen(false);
+    setBusy(key);
+    try { await fn(); } catch(e) { console.error("Export failed:", e); }
+    setBusy(null);
   };
+
+  const target = () => getTarget();
+
+  const menuStyle = {
+    position: "absolute", top: "calc(100% + 8px)", right: 0,
+    background: "#1C1C1C", borderRadius: 12,
+    border: "1px solid rgba(245,243,239,0.14)",
+    boxShadow: "0 12px 36px rgba(0,0,0,0.45)",
+    overflow: "hidden", minWidth: 160, zIndex: 100,
+  };
+  const itemStyle = {
+    display: "flex", alignItems: "center", gap: 10,
+    width: "100%", padding: "11px 16px",
+    background: "none", border: "none", cursor: "pointer",
+    color: "#F5F3EF", fontFamily: "var(--sans)", fontSize: 13,
+    fontWeight: 600, letterSpacing: "0.01em", textAlign: "left",
+    transition: "background 0.12s",
+  };
+  const dividerStyle = { height: 1, background: "rgba(245,243,239,0.1)", margin: "0 12px" };
+
   return (
-    <button className="ws-export" onClick={onClick} title="Print or save as PDF">
-      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M4 3h8v4H4z"/><path d="M4 11h8v3H4z"/><path d="M2 7h12v4H2z"/>
-        <circle cx="11.5" cy="9" r=".6" fill="currentColor" stroke="none"/>
-      </svg>
-      {label}
-    </button>
+    <div ref={menuRef} style={{ position: "absolute", top: 18, right: 18, zIndex: 50 }}>
+      <button
+        className="ws-export"
+        onClick={() => setOpen(o => !o)}
+        title="Export worksheet"
+        style={{ gap: 8 }}
+      >
+        {busy ? (
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+            <circle cx="7" cy="7" r="5" strokeDasharray="20 12" strokeDashoffset="0">
+              <animateTransform attributeName="transform" type="rotate" from="0 7 7" to="360 7 7" dur="0.8s" repeatCount="indefinite"/>
+            </circle>
+          </svg>
+        ) : (
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M8 2v8M5 7l3 3 3-3"/><path d="M3 12h10"/>
+          </svg>
+        )}
+        {busy ? `Exporting ${busy}…` : "Export"}
+        {!busy && (
+          <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M2 3.5 5 6.5 8 3.5"/>
+          </svg>
+        )}
+      </button>
+
+      {open && (
+        <div style={menuStyle}>
+          <button
+            style={itemStyle}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(245,243,239,0.07)"}
+            onMouseLeave={e => e.currentTarget.style.background = "none"}
+            onClick={() => run("PDF", () => exportPDF(target(), pageClass))}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 3h8v4H4z"/><path d="M4 11h8v3H4z"/><path d="M2 7h12v4H2z"/>
+              <circle cx="11.5" cy="9" r=".6" fill="currentColor" stroke="none"/>
+            </svg>
+            PDF
+          </button>
+          <div style={dividerStyle} />
+          <button
+            style={itemStyle}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(245,243,239,0.07)"}
+            onMouseLeave={e => e.currentTarget.style.background = "none"}
+            onClick={() => run("PPT", () => exportPPT(target()))}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="2" y="3" width="12" height="10" rx="2"/>
+              <path d="M6 7h2.5a1.5 1.5 0 0 1 0 3H6V7z"/>
+            </svg>
+            PowerPoint
+          </button>
+          <div style={dividerStyle} />
+          <button
+            style={itemStyle}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(245,243,239,0.07)"}
+            onMouseLeave={e => e.currentTarget.style.background = "none"}
+            onClick={() => run("SVG", () => exportSVG(target()))}
+          >
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="4" cy="8" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="12" cy="12" r="2"/>
+              <path d="M6 7.2 10 4.8M6 8.8l4 2.4"/>
+            </svg>
+            SVG
+          </button>
+        </div>
+      )}
+    </div>
   );
 }
 
