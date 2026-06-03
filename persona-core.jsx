@@ -52,11 +52,14 @@ const BLANK = {
 function usePersonaState(variantKey, { startBlank = false } = {}) {
   const storageKey = `ws.personaProfile.${variantKey}`;
   const [state, setState] = useStateP(() => {
+    const base = startBlank ? { ...BLANK, touched: true } : { ...EXAMPLE, touched: false };
     try {
       const raw = localStorage.getItem(storageKey);
-      if (raw) return JSON.parse(raw);
+      // Spread base first so any new fields added to EXAMPLE/BLANK since the
+      // last save are picked up, then overlay stored edits so nothing is lost.
+      if (raw) return { ...base, ...JSON.parse(raw) };
     } catch (_) {}
-    return startBlank ? { ...BLANK, touched: true } : { ...EXAMPLE, touched: false };
+    return base;
   });
 
   const commit = useCallbackP((next) => {
