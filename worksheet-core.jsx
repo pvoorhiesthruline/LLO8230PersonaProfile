@@ -201,16 +201,16 @@ async function captureCanvas(el) {
   });
 }
 
-async function exportPDF(target, pageClass) {
-  target.classList.add("print-target");
-  document.body.classList.add(pageClass);
-  requestAnimationFrame(() => {
-    window.print();
-    setTimeout(() => {
-      target.classList.remove("print-target");
-      document.body.classList.remove(pageClass);
-    }, 200);
-  });
+async function exportPDF(target) {
+  const canvas = await captureCanvas(target);
+  await loadScript("https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js");
+  const { jsPDF } = window.jspdf;
+  // Landscape page sized exactly to the 16:9 artboard (in mm: 1920:1080 ≈ 508×285.75mm)
+  const W_MM = 508, H_MM = 285.75;
+  const pdf = new jsPDF({ orientation: "landscape", unit: "mm", format: [W_MM, H_MM] });
+  const imgData = canvas.toDataURL("image/jpeg", 0.96);
+  pdf.addImage(imgData, "JPEG", 0, 0, W_MM, H_MM);
+  pdf.save("persona-profile.pdf");
 }
 
 async function exportPPT(target) {
