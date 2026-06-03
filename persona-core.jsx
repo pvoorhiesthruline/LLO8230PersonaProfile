@@ -19,7 +19,7 @@ const PERSONA_INTRO =
 const EXAMPLE = {
   name: "Maya R.",
   role: "Newly promoted team lead",
-  photo: "https://api.dicebear.com/8.x/personas/svg?seed=MayaR&backgroundColor=cfae70&backgroundType=gradientLinear",
+  photo: "https://api.dicebear.com/8.x/open-peeps/svg?seed=MayaR&backgroundColor=1c1c1c&backgroundType=solid&clothingColor=b49248&skinColor=d08b5b",
   quote: "I was great at the work. Now I’m responsible for the people who do it — and no one taught me how.",
   needs: [
     "Concrete tactics I can try in my very next 1:1",
