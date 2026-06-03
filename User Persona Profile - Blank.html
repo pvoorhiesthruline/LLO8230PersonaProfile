@@ -19,13 +19,13 @@
     height: 100%;
     font-family: "Inter Tight", -apple-system, BlinkMacSystemFont, sans-serif;
   }
-  #stage { position: fixed; inset: 0; display: grid; place-items: center; }
+  #stage { position: fixed; inset: 0; overflow: hidden; }
   #slide-frame {
     width: 1920px; height: 1080px;
-    transform-origin: center center;
+    transform-origin: top left;
     box-shadow: 0 30px 80px rgba(0,0,0,0.45), 0 6px 18px rgba(0,0,0,0.25);
     background: #FBFAF7;
-    position: relative;
+    position: absolute;
   }
   #app { width: 100%; height: 100%; }
 
@@ -66,7 +66,9 @@
     const SLIDE_W = 1920, SLIDE_H = 1080;
     function fit() {
       const s = Math.min(window.innerWidth / SLIDE_W, window.innerHeight / SLIDE_H);
-      frame.style.transform = `scale(${s})`;
+      const x = (window.innerWidth  - SLIDE_W * s) / 2;
+      const y = (window.innerHeight - SLIDE_H * s) / 2;
+      frame.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
     }
     window.addEventListener('resize', fit);
     fit();

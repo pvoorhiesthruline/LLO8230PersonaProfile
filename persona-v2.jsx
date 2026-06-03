@@ -82,7 +82,6 @@ function PersonaProfileV2({ mode = "example" }) {
 
   return (
     <div ref={ref} className="ws" style={v2.root}>
-      <WS2.ExportButton getTarget={() => ref.current} pageClass="print-slide" />
 
       {/* Dark identity panel */}
       <aside style={v2.panel}>
@@ -114,7 +113,10 @@ function PersonaProfileV2({ mode = "example" }) {
       <div style={v2.right}>
         <div style={v2.headRow}>
           <h1 style={v2.title}>User Persona Profile.</h1>
-          <PC2.SampleToggle touched={state.touched} onExample={loadExample} onClear={clearAll} />
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+            <PC2.SampleToggle touched={state.touched} onExample={loadExample} onClear={clearAll} />
+            <WS2.ExportButton getTarget={() => ref.current} pageClass="print-slide" />
+          </div>
         </div>
         <p style={v2.intro}>{PC2.PERSONA_INTRO}</p>
 

@@ -278,7 +278,7 @@ function ExportButton({ getTarget, pageClass = "print-slide" }) {
   const dividerStyle = { height: 1, background: "rgba(245,243,239,0.1)", margin: "0 12px" };
 
   return (
-    <div ref={menuRef} style={{ position: "absolute", top: 18, right: 18, zIndex: 50 }}>
+    <div ref={menuRef} style={{ position: "relative", flexShrink: 0 }}>
       <button
         className="ws-export"
         onClick={() => setOpen(o => !o)}
