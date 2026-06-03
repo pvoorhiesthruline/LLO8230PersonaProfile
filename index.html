@@ -96,60 +96,23 @@
   .card {
     display: flex;
     flex-direction: column;
-    border-radius: 20px;
-    overflow: hidden;
+    gap: 10px;
+    padding: 24px 28px 26px;
+    border-radius: 16px;
     text-decoration: none;
     outline: none;
-    position: relative;
     transition: transform 0.18s ease, box-shadow 0.18s ease;
     box-shadow: 0 4px 20px rgba(0,0,0,0.35);
   }
-  .card:hover  { transform: translateY(-4px); box-shadow: 0 16px 48px rgba(0,0,0,0.5); }
-  .card:focus  { box-shadow: 0 0 0 3px var(--gold), 0 16px 48px rgba(0,0,0,0.5); }
+  .card:hover  { transform: translateY(-3px); box-shadow: 0 12px 36px rgba(0,0,0,0.5); }
+  .card:focus  { box-shadow: 0 0 0 3px var(--gold), 0 12px 36px rgba(0,0,0,0.5); }
   .card:active { transform: translateY(-1px); }
 
-  .card__thumb {
-    width: 100%;
-    aspect-ratio: 16/9;
-    background: #111;
-    overflow: hidden;
-    position: relative;
-  }
-  .card__thumb img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: top left;
-    display: block;
-    transition: transform 0.22s ease;
-  }
-  .card:hover .card__thumb img { transform: scale(1.025); }
-
-  .card__thumb-fallback {
-    position: absolute; inset: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: #1a1a1a;
-    color: rgba(245,243,239,0.25);
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  /* Completed Example — dark cream-on-black */
-  .card--example .card__body { background: #232220; }
+  .card--example { background: #232220; }
   .card--example .card__tag { background: var(--gold-d); }
 
-  /* Blank — lighter paper tone */
-  .card--blank .card__body { background: #2c2926; }
+  .card--blank { background: #2c2926; }
   .card--blank .card__tag { background: var(--black); border: 1px solid rgba(245,243,239,0.18); }
-
-  .card__body {
-    padding: 28px 32px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
 
   .card__tag {
     font-family: var(--mono);
@@ -165,7 +128,7 @@
 
   .card__title {
     font-family: var(--sans);
-    font-size: clamp(22px, 2.4vw, 30px);
+    font-size: clamp(20px, 2vw, 26px);
     font-weight: 700;
     letter-spacing: -0.03em;
     line-height: 1.0;
@@ -173,25 +136,22 @@
   }
 
   .card__desc {
-    font-size: 14px;
+    font-size: 13.5px;
     line-height: 1.5;
-    color: rgba(245,243,239,0.58);
-    max-width: 400px;
+    color: rgba(245,243,239,0.55);
   }
 
   .card__cta {
-    margin-top: 8px;
+    margin-top: 4px;
     display: inline-flex;
     align-items: center;
-    gap: 8px;
+    gap: 7px;
     color: var(--gold);
-    font-size: 13.5px;
+    font-size: 13px;
     font-weight: 600;
     letter-spacing: 0.01em;
   }
-  .card__cta svg {
-    transition: transform 0.15s ease;
-  }
+  .card__cta svg { transition: transform 0.15s ease; }
   .card:hover .card__cta svg { transform: translateX(4px); }
 
   /* ── Footer ──────────────────────────────────────── */
@@ -245,39 +205,27 @@
   <main class="cards">
 
     <a class="card card--example" href="User Persona Profile - Completed Example.html">
-      <div class="card__thumb">
-        <img src="screenshots/01-completed-example.png" alt="Completed example preview" onerror="this.style.display='none'" />
-        <div class="card__thumb-fallback">Completed Example</div>
-      </div>
-      <div class="card__body">
-        <span class="card__tag">Sample</span>
-        <h2 class="card__title">Completed Example</h2>
-        <p class="card__desc">A worked example pre-filled with a representative persona — Maya R., a newly promoted team lead. Use it as a reference for your own worksheet.</p>
-        <span class="card__cta">
-          Open worksheet
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2.5 7h9M8 3.5 11.5 7 8 10.5"/>
-          </svg>
-        </span>
-      </div>
+      <span class="card__tag">Sample</span>
+      <h2 class="card__title">Completed Example</h2>
+      <p class="card__desc">Pre-filled with a worked persona — use it as a reference.</p>
+      <span class="card__cta">
+        Open
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2.5 7h9M8 3.5 11.5 7 8 10.5"/>
+        </svg>
+      </span>
     </a>
 
     <a class="card card--blank" href="User Persona Profile - Blank.html">
-      <div class="card__thumb">
-        <img src="screenshots/02-blank.png" alt="Blank worksheet preview" onerror="this.style.display='none'" />
-        <div class="card__thumb-fallback">Blank Worksheet</div>
-      </div>
-      <div class="card__body">
-        <span class="card__tag">Your turn</span>
-        <h2 class="card__title">Blank Worksheet</h2>
-        <p class="card__desc">An empty worksheet ready for you to fill in. Describe the representative user of the program being evaluated — edit directly in the browser.</p>
-        <span class="card__cta">
-          Open worksheet
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M2.5 7h9M8 3.5 11.5 7 8 10.5"/>
-          </svg>
-        </span>
-      </div>
+      <span class="card__tag">Your turn</span>
+      <h2 class="card__title">Blank Worksheet</h2>
+      <p class="card__desc">Empty and ready for you to fill in directly in the browser.</p>
+      <span class="card__cta">
+        Open
+        <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M2.5 7h9M8 3.5 11.5 7 8 10.5"/>
+        </svg>
+      </span>
     </a>
 
   </main>
