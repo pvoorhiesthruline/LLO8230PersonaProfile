@@ -85,7 +85,7 @@ function PersonaProfileV2({ mode = "example" }) {
       {/* Dark identity panel */}
       <aside style={v2.panel}>
         <PC2.Eyebrow dark />
-        <PC2.Avatar name={state.name} size={172} variant="dark" />
+        <PC2.Avatar name={state.name} src={state.photo || ""} size={172} variant="dark" />
         <div>
           <div style={v2.pKicker}>The Persona</div>
           <WS2.Editable value={state.name} onChange={(v) => set("name", v)} placeholder="Name the persona"

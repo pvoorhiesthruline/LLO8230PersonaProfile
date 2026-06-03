@@ -19,6 +19,7 @@ const PERSONA_INTRO =
 const EXAMPLE = {
   name: "Maya R.",
   role: "Newly promoted team lead",
+  photo: "https://api.dicebear.com/8.x/personas/svg?seed=MayaR&backgroundColor=cfae70&backgroundType=gradientLinear",
   quote: "I was great at the work. Now I’m responsible for the people who do it — and no one taught me how.",
   needs: [
     "Concrete tactics I can try in my very next 1:1",
@@ -36,7 +37,7 @@ const EXAMPLE = {
 };
 
 const BLANK = {
-  name: "", role: "", quote: "",
+  name: "", role: "", quote: "", photo: "",
   needs: ["", "", ""],
   problems: ["", "", ""],
   interests: ["", ""],
@@ -87,7 +88,7 @@ function usePersonaState(variantKey, { startBlank = false } = {}) {
 // ── Avatar placeholder ──────────────────────────────────────────────────
 // A drop-a-photo placeholder. Shows derived initials if a name is typed,
 // else a neutral head silhouette. `shape` = "circle" | "square".
-function Avatar({ name = "", size = 168, shape = "circle", variant = "light" }) {
+function Avatar({ name = "", src = "", size = 168, shape = "circle", variant = "light" }) {
   const initials = (name || "").trim().split(/\s+/).filter(Boolean)
     .slice(0, 2).map(w => w[0]).join("").toUpperCase();
   const dark = variant === "dark";
@@ -97,16 +98,19 @@ function Avatar({ name = "", size = 168, shape = "circle", variant = "light" }) 
   const fg    = dark ? "var(--vu-cream)" : "var(--vu-oak)";
   return (
     <div
-      title="Persona photo — drop in a real image later"
+      title="Persona photo"
       style={{
         width: size, height: size, borderRadius: radius,
         background: bg,
-        border: `2px ${initials ? "solid" : "dashed"} ${ring}`,
+        border: `2px solid ${ring}`,
         display: "flex", alignItems: "center", justifyContent: "center",
         flex: "0 0 auto", overflow: "hidden", position: "relative",
       }}
     >
-      {initials ? (
+      {src ? (
+        <img src={src} alt={name || "Persona"} crossOrigin="anonymous"
+             style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+      ) : initials ? (
         <span style={{
           fontFamily: "var(--serif)", fontWeight: 600, fontStyle: "italic",
           fontSize: size * 0.4, color: fg, letterSpacing: "-0.02em", lineHeight: 1,
