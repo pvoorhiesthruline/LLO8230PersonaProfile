@@ -50,7 +50,7 @@ const BLANK = {
 // flips to true on any edit (hides the “sample” ribbon). loadExample / clear
 // reset the whole sheet.
 function usePersonaState(variantKey, { startBlank = false } = {}) {
-  const storageKey = `ws.personaProfile.${variantKey}`;
+  const storageKey = `ws.personaProfile.2.${variantKey}`;
   const [state, setState] = useStateP(() => {
     const base = startBlank ? { ...BLANK, touched: true } : { ...EXAMPLE, touched: false };
     try {
