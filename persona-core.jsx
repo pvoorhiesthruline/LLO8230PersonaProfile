@@ -19,7 +19,6 @@ const PERSONA_INTRO =
 const EXAMPLE = {
   name: "Maya R.",
   role: "Newly promoted team lead",
-  photo: "https://api.dicebear.com/8.x/lorelei/svg?seed=MayaR&backgroundColor=1c1c1c&backgroundType=solid",
   quote: "I was great at the work. Now I’m responsible for the people who do it — and no one taught me how.",
   needs: [
     "Concrete tactics I can try in my very next 1:1",
@@ -50,7 +49,7 @@ const BLANK = {
 // flips to true on any edit (hides the “sample” ribbon). loadExample / clear
 // reset the whole sheet.
 function usePersonaState(variantKey, { startBlank = false } = {}) {
-  const storageKey = `ws.personaProfile.3.${variantKey}`;
+  const storageKey = `ws.personaProfile.4.${variantKey}`;
   const [state, setState] = useStateP(() => {
     const base = startBlank ? { ...BLANK, touched: true } : { ...EXAMPLE, touched: false };
     try {
